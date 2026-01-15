@@ -13,3 +13,4 @@ export 'report/smart_daily_report_builder.dart';
 export 'report/smart_email_reporter.dart';
 
 export 'ui/reporter_screen.dart';
+export 'model/screen_log.dart';

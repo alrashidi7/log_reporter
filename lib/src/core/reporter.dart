@@ -1,14 +1,25 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
+
+import 'package:log_reporter/app_log_reporter.dart';
 import 'package:talker_flutter/talker_flutter.dart';
-import 'reporter_config.dart';
 
 class AppLogReporter {
+  // ------------------------------
+  // Package fields
+  // ------------------------------
   static late Talker _talker;
   static late LogReporterConfig _config;
+  static final ScreenTrackingObserver screenObserver = ScreenTrackingObserver();
 
-  static void init(LogReporterConfig config) {
+  // ------------------------------
+  // Initialize package
+  // ------------------------------
+  static void init({required LogReporterConfig config}) {
     _config = config;
 
+    // Initialize Talker with history
     _talker = TalkerFlutter.init(
       settings: TalkerSettings(
         enabled: config.enableLogs,
@@ -17,30 +28,61 @@ class AppLogReporter {
       ),
     );
 
+    // Set up Flutter error catching if enabled
     if (_config.enableFlutterErrorCatching) {
       _setupFlutterErrorCatching();
     }
   }
 
+  // ------------------------------
+  // Getters
+  // ------------------------------
   static Talker get talker => _talker;
   static LogReporterConfig get config => _config;
+
+  // ------------------------------
+  // Flutter Error Catching
+  // ------------------------------
   static void _setupFlutterErrorCatching() {
-    // Save the previous handler to not break Flutter defaults
     final FlutterExceptionHandler? defaultOnError = FlutterError.onError;
 
     FlutterError.onError = (FlutterErrorDetails details) {
-      // Log the error to Talker
-      talker.error(details.exceptionAsString(), {
-        'type': 'flutter_framework_error',
-        'time': DateTime.now().toIso8601String(),
-      }, details.stack);
+      // Create structured error log
+      final errorLog = ErrorLog(
+        message: details.exceptionAsString(),
+        stackTrace: details.stack,
+        type: 'flutter_framework_error',
+      );
 
-      // Optionally, still call the default Flutter error handler
+      // Attach to current screen if exists
+      screenObserver.addError(errorLog);
+
+      // Log to Talker
+      talker.error(
+        '[MyAppLog][Flutter Error] ${details.exceptionAsString()}',
+        details.exception,
+        details.stack,
+      );
+
+      // Call default handler or dump to console
       if (defaultOnError != null) {
         defaultOnError(details);
       } else {
         FlutterError.dumpErrorToConsole(details);
       }
     };
+
+    // Catch async errors globally
+    runZonedGuarded(() {}, (error, stackTrace) {
+      final errorLog = ErrorLog(
+        message: error.toString(),
+        stackTrace: stackTrace,
+        type: 'async_error',
+      );
+
+      screenObserver.addError(errorLog);
+
+      talker.error('[MyAppLog][Async Error] $error', error, stackTrace);
+    });
   }
 }

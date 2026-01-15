@@ -15,6 +15,7 @@ dependencies:
   mailer: ^6.6.0
   flutter_bloc: ^9.1.1
   talker: ^5.1.11
+  collection: ^1.19.1
 
 dev_dependencies:
   flutter_test:
