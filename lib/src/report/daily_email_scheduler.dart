@@ -53,6 +53,14 @@ class DailyEmailScheduler {
       isProduction: isProduction,
     );
 
+    if (previewInConsole) {
+      print('--- Daily Email Preview ---');
+      print('To: $toEmail');
+      print('Subject: ${emailContent.subject}');
+      print('Body:\n${emailContent.body}');
+      print('---------------------------');
+    }
+
     await reporter.sendReport(
       smtpEmail: smtpEmail,
       appPassword: appPassword,

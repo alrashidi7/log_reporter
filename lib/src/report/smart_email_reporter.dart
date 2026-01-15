@@ -20,43 +20,6 @@ class SmartEmailReporter {
     this.notifyOnSlowApiOnly = false,
   });
 
-  /// Call at end of day or on-demand
-  Future<void> sendDailyReportIfNeeded({
-    required String smtpEmail,
-    required String appPassword,
-    required String toEmail,
-    required String appName,
-    required bool isProduction,
-    bool previewInConsole = false, // new option
-  }) async {
-    final emailContent = await prepareReport(
-      smtpEmail: smtpEmail,
-      appPassword: appPassword,
-      toEmail: toEmail,
-      appName: appName,
-      isProduction: isProduction,
-    );
-
-    if (previewInConsole) {
-      print('--- Daily Email Preview ---');
-      print('To: $toEmail');
-      print('Subject: ${emailContent.subject}');
-      print('Body:\n${emailContent.body}');
-      print('---------------------------');
-    }
-
-    if (emailContent.body.isEmpty) return; // no logs to send
-
-    await sendReport(
-      smtpEmail: smtpEmail,
-      appPassword: appPassword,
-      toEmail: toEmail,
-      appName: appName,
-      isProduction: isProduction,
-      report: emailContent.body,
-    );
-  }
-
   Future<void> sendReport({
     required String smtpEmail,
     required String appPassword,
