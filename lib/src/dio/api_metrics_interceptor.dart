@@ -59,7 +59,7 @@ class ApiMetricsInterceptor extends Interceptor {
       // Log with Talker
       talker.error(
         '[MyAppLog][API ERROR] ${options.method} ${options.path} (${duration}ms)',
-        error,
+        errorLog.message,
         error.stackTrace,
       );
     } else {

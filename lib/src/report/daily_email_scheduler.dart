@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:developer';
+import 'package:flutter/foundation.dart';
+
 import 'smart_email_reporter.dart';
 
 class DailyEmailScheduler {
@@ -53,12 +56,14 @@ class DailyEmailScheduler {
       isProduction: isProduction,
     );
 
-    if (previewInConsole) {
-      print('--- Daily Email Preview ---');
-      print('To: $toEmail');
-      print('Subject: ${emailContent.subject}');
-      print('Body:\n${emailContent.body}');
-      print('---------------------------');
+    if (previewInConsole && kDebugMode) {
+      log('---------------------------');
+      log('--- Daily Email Preview ---');
+      log('To: $toEmail');
+      log('Subject: ${emailContent.subject}');
+      log('Body:\n${emailContent.body}');
+      log('---------------------------');
+      log('---------------------------');
     }
 
     await reporter.sendReport(

@@ -5,18 +5,16 @@ class SmartDailyReportBuilder {
   static String build() {
     final logs = AppLogReporter.talker.history;
 
-    final today = logs.where(
-      (e) => _isToday(e.time),
-    ).toList();
+    final today = logs.where((e) => _isToday(e.time)).toList();
 
-    final errors =
-        today.where((e) => e.logLevel == LogLevel.error).toList();
+    final errors = today.where((e) => e.logLevel == LogLevel.error).toList();
 
-    final warnings =
-        today.where((e) => e.logLevel == LogLevel.warning).toList();
+    final warnings = today
+        .where((e) => e.logLevel == LogLevel.warning)
+        .toList();
 
     final slowApis = warnings
-        .where((e) => (e.message??'').contains('Slow API'))
+        .where((e) => (e.message ?? '').contains('Slow API'))
         .toList();
 
     final buffer = StringBuffer();
@@ -40,9 +38,7 @@ class SmartDailyReportBuilder {
     if (errors.isNotEmpty) {
       buffer.writeln('Error Details:');
       for (var i = 0; i < errors.length; i++) {
-        buffer.writeln(
-          '${i + 1}. ${errors[i].message}',
-        );
+        buffer.writeln('${i + 1}. ${errors[i].message}');
       }
       buffer.writeln();
     }
@@ -61,9 +57,7 @@ class SmartDailyReportBuilder {
     if (errors.isEmpty && slowApis.isEmpty) {
       buffer.writeln('No issues detected. No action required.');
     } else {
-      buffer.writeln(
-        'Recommended to investigate the issues listed above.',
-      );
+      buffer.writeln('Recommended to investigate the issues listed above.');
     }
 
     return buffer.toString();
