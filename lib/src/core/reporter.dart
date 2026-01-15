@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'reporter_config.dart';
 
@@ -15,8 +16,31 @@ class AppLogReporter {
         maxHistoryItems: config.maxHistoryItems,
       ),
     );
+
+    if (_config.enableFlutterErrorCatching) {
+      _setupFlutterErrorCatching();
+    }
   }
 
   static Talker get talker => _talker;
   static LogReporterConfig get config => _config;
+  static void _setupFlutterErrorCatching() {
+    // Save the previous handler to not break Flutter defaults
+    final FlutterExceptionHandler? defaultOnError = FlutterError.onError;
+
+    FlutterError.onError = (FlutterErrorDetails details) {
+      // Log the error to Talker
+      talker.error(details.exceptionAsString(), {
+        'type': 'flutter_framework_error',
+        'time': DateTime.now().toIso8601String(),
+      }, details.stack);
+
+      // Optionally, still call the default Flutter error handler
+      if (defaultOnError != null) {
+        defaultOnError(details);
+      } else {
+        FlutterError.dumpErrorToConsole(details);
+      }
+    };
+  }
 }
