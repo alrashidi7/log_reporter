@@ -40,9 +40,9 @@ class ScreenTrackingObserver extends NavigatorObserver {
   List<ScreenLog> get screens => _screens;
 
   // Call this to log errors
-  void addError(ErrorLog error) {
-    if (_currentScreen != null) {
-      _currentScreen!.errors.add(error);
+  void addError(ErrorLog error, {ScreenLog? currentScreen}) {
+    if ((currentScreen ?? _currentScreen) != null) {
+      (currentScreen ?? _currentScreen)!.errors.add(error);
     } else {
       // optional: log errors without screen
       AppLogReporter.talker.error(
@@ -95,9 +95,9 @@ class ScreenTrackingObserver extends NavigatorObserver {
   }
 
   // Add API log helper
-  void addApiLog(ApiLog log) {
-    if (_currentScreen != null) {
-      _currentScreen!.apiLogs.add(log);
+  void addApiLog(ApiLog log, {ScreenLog? currentScreen}) {
+    if ((currentScreen ?? _currentScreen) != null) {
+      (currentScreen ?? _currentScreen)!.apiLogs.add(log);
     }
   }
 }

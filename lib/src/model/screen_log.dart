@@ -56,7 +56,12 @@ class ErrorLog {
         "request_body": dioException?.requestOptions.data,
         "request_response": dioException?.response?.data,
       };
-      message = "$message${logData.entries.join("\n")}";
+
+      String apiLogError = "";
+      for (var element in logData.entries) {
+        apiLogError = "$apiLogError \n ${element.key}:${element.value}";
+      }
+      message = "$message \n $apiLogError";
     }
   }
 }
