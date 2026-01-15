@@ -9,7 +9,7 @@ class ScreenTrackingObserver extends NavigatorObserver {
     _enterTime = DateTime.now();
 
     AppLogReporter.talker.info(
-      'Screen Opened: ${route.settings.name}',
+      'Screen Opened: ${route.settings.name ?? route.runtimeType.toString()}',
     );
   }
 
@@ -17,11 +17,10 @@ class ScreenTrackingObserver extends NavigatorObserver {
   void didPop(Route route, Route? previousRoute) {
     if (_enterTime == null) return;
 
-    final duration =
-        DateTime.now().difference(_enterTime!).inMilliseconds;
+    final duration = DateTime.now().difference(_enterTime!).inMilliseconds;
 
     AppLogReporter.talker.info(
-      'Screen Closed: ${route.settings.name} (${duration}ms)',
+      'Screen Closed: ${route.settings.name ?? route.runtimeType.toString()} (${duration}ms)',
     );
   }
 }
