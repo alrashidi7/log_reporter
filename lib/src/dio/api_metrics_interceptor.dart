@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:log_reporter/app_log_reporter.dart';
-import 'package:log_reporter/src/model/screen_log.dart';
+
 import 'package:talker_flutter/talker_flutter.dart';
 
 class ApiMetricsInterceptor extends Interceptor {
@@ -50,6 +50,7 @@ class ApiMetricsInterceptor extends Interceptor {
     if (error != null) {
       final errorLog = ErrorLog(
         message: error.message ?? '',
+        dioException: error,
         stackTrace: error.stackTrace,
         type: 'api_error',
       );

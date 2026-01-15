@@ -1,15 +1,14 @@
 import 'dart:async';
-
 import 'smart_email_reporter.dart';
 
 class DailyEmailScheduler {
   static Timer? _timer;
 
+  /// Start daily scheduling
   static void start({
     required String smtpEmail,
     required String appPassword,
     required String toEmail,
-
     required String appName,
     required bool isProduction,
     int hour = 20,
@@ -27,6 +26,40 @@ class DailyEmailScheduler {
       notifyOnSlowApiOnly: notifyOnSlowApiOnly,
       appName: appName,
       isProduction: isProduction,
+    );
+  }
+
+  /// Send email immediately
+  static Future<void> sendNow({
+    required String smtpEmail,
+    required String appPassword,
+    required String toEmail,
+    required String appName,
+    required bool isProduction,
+    int slowApiThresholdCount = 1,
+    bool notifyOnSlowApiOnly = false,
+    bool previewInConsole = true, // <-- new option
+  }) async {
+    final reporter = SmartEmailReporter(
+      slowApiThresholdCount: slowApiThresholdCount,
+      notifyOnSlowApiOnly: notifyOnSlowApiOnly,
+    );
+
+    final emailContent = await reporter.prepareReport(
+      smtpEmail: smtpEmail,
+      appPassword: appPassword,
+      toEmail: toEmail,
+      appName: appName,
+      isProduction: isProduction,
+    );
+
+    await reporter.sendReport(
+      smtpEmail: smtpEmail,
+      appPassword: appPassword,
+      toEmail: toEmail,
+      appName: appName,
+      isProduction: isProduction,
+      report: emailContent.body,
     );
   }
 
@@ -53,17 +86,15 @@ class DailyEmailScheduler {
 
     _timer?.cancel();
     _timer = Timer(duration, () async {
-      final reporter = SmartEmailReporter(
-        slowApiThresholdCount: slowApiThresholdCount,
-        notifyOnSlowApiOnly: notifyOnSlowApiOnly,
-      );
-
-      await reporter.sendDailyReportIfNeeded(
+      await sendNow(
         smtpEmail: smtpEmail,
         appPassword: appPassword,
         toEmail: toEmail,
         appName: appName,
         isProduction: isProduction,
+        slowApiThresholdCount: slowApiThresholdCount,
+        notifyOnSlowApiOnly: notifyOnSlowApiOnly,
+        previewInConsole: false, // don't preview on scheduled run
       );
 
       // Reschedule for next day

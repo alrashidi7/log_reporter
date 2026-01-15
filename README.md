@@ -2,7 +2,7 @@
 
 A **powerful, reusable logging & reporting package for Flutter apps** built on top of **Talker**, **Dio**, and **Cubit**.
 
-`app_log_reporter` helps you monitor **screen usage**, **API performance**, **failures**, and **user-facing issues**, and generate **daily reports** that can be sent automatically via email.
+`log_reporter` helps you monitor **screen usage**, **API performance**, **failures**, and **user-facing issues**, and generate **daily reports** that can be sent automatically via email.
 
 ---
 
@@ -34,5 +34,12 @@ A **powerful, reusable logging & reporting package for Flutter apps** built on t
 
 ```yaml
 dependencies:
-  app_log_reporter:
-    path: ../app_log_reporter
+      log_reporter:
+        git:
+        url: https://github.com/alrashidi7/log_reporter.git
+        ref: main
+
+
+
+
+

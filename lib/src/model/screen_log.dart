@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 class ScreenLog {
   final String screenName;
   final DateTime openedAt;
@@ -32,11 +34,29 @@ class ApiLog {
 }
 
 class ErrorLog {
-  final String message;
+  String message;
   final StackTrace? stackTrace;
-  final DateTime time;
+  DateTime? time;
   final String? type;
+  final DioException? dioException;
 
-  ErrorLog({required this.message, this.stackTrace, DateTime? time, this.type})
-    : time = time ?? DateTime.now();
+  ErrorLog({
+    required this.message,
+    this.stackTrace,
+    this.time,
+    this.type,
+    this.dioException,
+  }) {
+    time = time ?? DateTime.now();
+
+    if (dioException.runtimeType != Null) {
+      var logData = {
+        "status_code": dioException?.response?.statusCode,
+        "request_url": dioException?.response?.realUri.toString(),
+        "request_body": dioException?.requestOptions.data,
+        "request_response": dioException?.response?.data,
+      };
+      message = "$message${logData.entries.join("\n")}";
+    }
+  }
 }
