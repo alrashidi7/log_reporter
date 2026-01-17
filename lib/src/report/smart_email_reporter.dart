@@ -75,7 +75,7 @@ class SmartEmailReporter {
     final reportBody = SmartDailyReportBuilder.build();
 
     return EmailContent(
-      subject: '[${appName}] Daily Log Report',
+      subject: '[$appName] Daily Log Report',
       body: reportBody,
     );
   }

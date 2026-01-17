@@ -46,7 +46,7 @@ class ScreenTrackingObserver extends NavigatorObserver {
     } else {
       // optional: log errors without screen
       AppLogReporter.talker.error(
-        '[No Screen] ${error.message}',
+        '[No Screen] ${error.generatedMessage}',
 
         error.stackTrace,
       );
@@ -79,6 +79,7 @@ class ScreenTrackingObserver extends NavigatorObserver {
           route.settings.name ?? route.builder.runtimeType.toString();
       if (_currentScreen != null && _currentScreen!.screenName == screenName) {
         _currentScreen!.closedAt = DateTime.now();
+       
         AppLogReporter.talker.info(
           '[Screen Closed] | $screenName | Duration: ${_currentScreen!.durationMs}ms',
         );

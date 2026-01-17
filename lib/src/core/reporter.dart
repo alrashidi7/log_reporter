@@ -49,9 +49,9 @@ class AppLogReporter {
     FlutterError.onError = (FlutterErrorDetails details) {
       // Create structured error log
       final errorLog = ErrorLog(
-        message: details.exceptionAsString(),
+       generatedMessage: details.exceptionAsString(),
         stackTrace: details.stack,
-        type: 'flutter_framework_error',
+        type: ErrorLogType.exeption, time: null, apiLog: null, screenLog: null,
       );
 
       // Attach to current screen if exists
@@ -75,10 +75,11 @@ class AppLogReporter {
     // Catch async errors globally
     runZonedGuarded(() {}, (error, stackTrace) {
       final errorLog = ErrorLog(
-        message: error.toString(),
+       generatedMessage: error.toString(),
         stackTrace: stackTrace,
-        type: 'async_error',
+        type: ErrorLogType.exeption, time: null, apiLog: null, screenLog: null,
       );
+
 
       screenObserver.addError(errorLog);
 

@@ -41,25 +41,27 @@ class ApiMetricsInterceptor extends Interceptor {
       url: options.path,
       durationMs: duration,
       isError: error != null,
+      dioException: error
     );
 
     // Attach API log to current screen
     screenObserver.addApiLog(apiLog);
-
+ final errorLog = ErrorLog(stackTrace: error?.stackTrace, time: null, type: ErrorLogType.api, apiLog: apiLog, screenLog: null);
+   
     // Also capture errors into structured error logs
     if (error != null) {
-      final errorLog = ErrorLog(
-        message: error.message ?? '',
-        dioException: error,
-        stackTrace: error.stackTrace,
-        type: 'api_error',
-      );
+      //  = ErrorLog(
+      //   message: error.message ?? '',
+      //   dioException: error,
+      //   stackTrace: error.stackTrace,
+      //   type: 'api_error',
+      // );
       screenObserver.addError(errorLog);
 
       // Log with Talker
       talker.error(
         '[MyAppLog][API ERROR] ${options.method} ${options.path} (${duration}ms)',
-        errorLog.message,
+        errorLog.generatedMessage,
         error.stackTrace,
       );
     } else {
@@ -72,6 +74,7 @@ class ApiMetricsInterceptor extends Interceptor {
       if (isSlow) {
         talker.warning(
           '[MyAppLog][Slow API] ${options.method} ${options.path} - ${duration}ms',
+        errorLog.generatedMessage,
         );
       }
     }

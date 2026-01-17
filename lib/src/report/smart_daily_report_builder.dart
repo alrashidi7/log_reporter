@@ -32,6 +32,7 @@ class SmartDailyReportBuilder {
     buffer.writeln('Summary:');
     buffer.writeln('• Total logs: ${today.length}');
     buffer.writeln('• Errors detected: ${errors.length}');
+    buffer.writeln('• Warnings detected: ${warnings.length}');
     buffer.writeln('• Slow API requests: ${slowApis.length}\n');
 
     // Errors
@@ -39,6 +40,15 @@ class SmartDailyReportBuilder {
       buffer.writeln('Error Details:');
       for (var i = 0; i < errors.length; i++) {
         buffer.writeln('${i + 1}. ${errors[i].message}');
+      }
+      buffer.writeln();
+    }
+
+    // Warnings
+    if (warnings.isNotEmpty) {
+      buffer.writeln('Warning Details:');
+      for (var i = 0; i < warnings.length; i++) {
+        buffer.writeln('${i + 1}. ${warnings[i].message}');
       }
       buffer.writeln();
     }
