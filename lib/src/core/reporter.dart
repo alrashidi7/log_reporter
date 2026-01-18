@@ -5,8 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:log_reporter/app_log_reporter.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
-import '../../dependancy_injection.dart' as di;
-
 class AppLogReporter {
   // ------------------------------
   // Package fields
@@ -21,8 +19,6 @@ class AppLogReporter {
   static void init({required LogReporterConfig config}) async {
     _config = config;
 
-    await di.init();
-
     // Initialize Talker with history
     _talker = TalkerFlutter.init(
       settings: TalkerSettings(
@@ -31,7 +27,7 @@ class AppLogReporter {
         maxHistoryItems: config.maxHistoryItems,
       ),
     );
-    _screenObserver = di.sl<ScreenTrackingObserver>();
+    _screenObserver = ScreenTrackingObserver();
 
     // Set up Flutter error catching if enabled
     if (_config.enableFlutterErrorCatching) {

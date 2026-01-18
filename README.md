@@ -30,6 +30,18 @@ A **powerful, reusable logging & reporting package for Flutter apps** built on t
 
 ## 📦 Installation
 
+-  sl.registerLazySingleton<ScreenTrackingObserver>(
+      () => ScreenTrackingObserver());
+-  sl.registerLazySingleton<ApiMetricsInterceptor>(
+      () => ApiMetricsInterceptor(sl()));
+
+-  sl.registerLazySingleton<LogReporterConfig>(() => LogReporterConfig(
+        enableEmailReport: true,
+        enableFlutterErrorCatching: true,
+        enableLogs: true,
+      ));
+
+
 ### Local / Internal Package
 
 ```yaml
