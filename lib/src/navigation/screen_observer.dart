@@ -46,7 +46,7 @@ class ScreenTrackingObserver extends NavigatorObserver {
     } else {
       // optional: log errors without screen
       AppLogReporter.talker.error(
-        '[No Screen] ${error.generatedMessage}',
+        '[No Screen] ${error.exeptionMsg}',
 
         error.stackTrace,
       );
