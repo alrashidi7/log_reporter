@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
-enum ErrorLogType {ui , api , exeption}
+enum ErrorLogType { ui, api, exeption }
+
 class ScreenLog {
   final String screenName;
   final DateTime openedAt;
@@ -15,12 +16,11 @@ class ScreenLog {
     this.closedAt,
     List<ApiLog>? apiLogs,
     List<ErrorLog>? errors,
-    this.screenSummary
+    this.screenSummary,
   }) : apiLogs = apiLogs ?? [],
        errors = errors ?? [];
 
   int? get durationMs => closedAt?.difference(openedAt).inMilliseconds;
-
 }
 
 class ApiLog {
@@ -35,11 +35,11 @@ class ApiLog {
     required this.url,
     required this.durationMs,
     this.isError = false,
-    this.dioException
+    this.dioException,
   });
 
-String  generateApiLog(){
-  String message = '-$method * $url Duration $durationMs Ms';
+  String generateApiLog() {
+    String message = '-$method * $url Duration $durationMs Ms';
 
     if (dioException.runtimeType != Null) {
       var logData = {
@@ -55,11 +55,8 @@ String  generateApiLog(){
       }
       message = "$message \n $apiLogError";
     }
-  return  message;
+    return message;
   }
-
-
- 
 }
 
 class ErrorLog {
@@ -68,31 +65,29 @@ class ErrorLog {
   final ErrorLogType? type;
   final ScreenLog? screenLog;
   final ApiLog? apiLog;
-  String? generatedMessage;
+  final String? exeptionMsg;
 
   ErrorLog({
-   required this.stackTrace,
-   required this.time,
-   required this.type,
-  required  this.apiLog,
-  required  this.screenLog,
-  this.generatedMessage
+    required this.stackTrace,
+    required this.time,
+    required this.type,
+    required this.apiLog,
+    required this.screenLog,
+    this.exeptionMsg,
   }) {
     time = time ?? DateTime.now();
+  }
 
-    if(generatedMessage.runtimeType !=Null){
-      switch (type) {
-        case ErrorLogType.api:
-        generatedMessage = apiLog?.generateApiLog();
-          
-          break;
-        case ErrorLogType.ui:
-        // generatedMessage = screenLog?.generateApiLog();
-          
-          break;
-        default:
-      }
+  String generateErrorMsg() {
+    switch (type) {
+      case ErrorLogType.api:
+        return apiLog?.generateApiLog() ?? exeptionMsg ?? '';
+
+      case ErrorLogType.ui:
+        return exeptionMsg ?? '';
+
+      default:
+        return exeptionMsg ?? "";
     }
-
   }
 }

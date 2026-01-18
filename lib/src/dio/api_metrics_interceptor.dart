@@ -66,7 +66,7 @@ class ApiMetricsInterceptor extends Interceptor {
       // Log with Talker
       talker.error(
         '[API ERROR]-[${screenObserver.currentScreen?.screenName}]- ${options.method} ${options.path} (${duration}ms)',
-        errorLog.generatedMessage,
+        errorLog.generateErrorMsg(),
         error.stackTrace,
       );
     } else {
@@ -79,7 +79,7 @@ class ApiMetricsInterceptor extends Interceptor {
       if (isSlow) {
         talker.warning(
           '[Slow API]-[${screenObserver.currentScreen?.screenName}]- ${options.method} ${options.path} - ${duration}ms',
-          errorLog.generatedMessage,
+          errorLog.generateErrorMsg(),
         );
       }
     }
