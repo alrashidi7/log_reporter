@@ -41,13 +41,19 @@ class ApiMetricsInterceptor extends Interceptor {
       url: options.path,
       durationMs: duration,
       isError: error != null,
-      dioException: error
+      dioException: error,
     );
 
     // Attach API log to current screen
     screenObserver.addApiLog(apiLog);
- final errorLog = ErrorLog(stackTrace: error?.stackTrace, time: null, type: ErrorLogType.api, apiLog: apiLog, screenLog: null);
-   
+    final errorLog = ErrorLog(
+      stackTrace: error?.stackTrace,
+      time: null,
+      type: ErrorLogType.api,
+      apiLog: apiLog,
+      screenLog: null,
+    );
+
     // Also capture errors into structured error logs
     if (error != null) {
       //  = ErrorLog(
@@ -56,25 +62,24 @@ class ApiMetricsInterceptor extends Interceptor {
       //   stackTrace: error.stackTrace,
       //   type: 'api_error',
       // );
-      screenObserver.addError(errorLog);
 
       // Log with Talker
       talker.error(
-        '[MyAppLog][API ERROR] ${options.method} ${options.path} (${duration}ms)',
+        '[API ERROR]-[${screenObserver.currentScreen?.screenName}]- ${options.method} ${options.path} (${duration}ms)',
         errorLog.generatedMessage,
         error.stackTrace,
       );
     } else {
       // Normal API log
-      talker.log(
-        '[MyAppLog][API] ${options.method} ${options.path} (${duration}ms)',
-        logLevel: isSlow ? LogLevel.warning : LogLevel.info,
-      );
+      // talker.log(
+      //   '[API]-[${screenObserver.currentScreen?.screenName}]- ${options.method} ${options.path} (${duration}ms)',
+      //   logLevel: isSlow ? LogLevel.warning : LogLevel.info,
+      // );
 
       if (isSlow) {
         talker.warning(
-          '[MyAppLog][Slow API] ${options.method} ${options.path} - ${duration}ms',
-        errorLog.generatedMessage,
+          '[Slow API]-[${screenObserver.currentScreen?.screenName}]- ${options.method} ${options.path} - ${duration}ms',
+          errorLog.generatedMessage,
         );
       }
     }

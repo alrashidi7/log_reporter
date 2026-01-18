@@ -35,14 +35,14 @@ import '../core/reporter.dart';
 
 class ScreenTrackingObserver extends NavigatorObserver {
   final List<ScreenLog> _screens = [];
-  ScreenLog? _currentScreen;
+  ScreenLog? currentScreen;
 
   List<ScreenLog> get screens => _screens;
 
   // Call this to log errors
   void addError(ErrorLog error, {ScreenLog? currentScreen}) {
-    if ((currentScreen ?? _currentScreen) != null) {
-      (currentScreen ?? _currentScreen)!.errors.add(error);
+    if ((currentScreen ?? currentScreen) != null) {
+      (currentScreen ?? currentScreen)!.errors.add(error);
     } else {
       // optional: log errors without screen
       AppLogReporter.talker.error(
@@ -58,15 +58,15 @@ class ScreenTrackingObserver extends NavigatorObserver {
     if (route is MaterialPageRoute) {
       final screenName =
           route.settings.name ?? route.builder.runtimeType.toString();
-      if (_currentScreen != null && _currentScreen!.closedAt == null) {
-        _currentScreen!.closedAt = DateTime.now();
+      if (currentScreen != null && currentScreen!.closedAt == null) {
+        currentScreen!.closedAt = DateTime.now();
       }
 
-      _currentScreen = ScreenLog(
+      currentScreen = ScreenLog(
         screenName: screenName,
         openedAt: DateTime.now(),
       );
-      _screens.add(_currentScreen!);
+      _screens.add(currentScreen!);
 
       AppLogReporter.talker.info('[Screen Opened] | $screenName');
     }
@@ -77,14 +77,14 @@ class ScreenTrackingObserver extends NavigatorObserver {
     if (route is MaterialPageRoute) {
       final screenName =
           route.settings.name ?? route.builder.runtimeType.toString();
-      if (_currentScreen != null && _currentScreen!.screenName == screenName) {
-        _currentScreen!.closedAt = DateTime.now();
-       
+      if (currentScreen != null && currentScreen!.screenName == screenName) {
+        currentScreen!.closedAt = DateTime.now();
+
         AppLogReporter.talker.info(
-          '[Screen Closed] | $screenName | Duration: ${_currentScreen!.durationMs}ms',
+          '[Screen Closed] | $screenName | Duration: ${currentScreen!.durationMs}ms',
         );
       }
-      _currentScreen = previousRoute is MaterialPageRoute
+      currentScreen = previousRoute is MaterialPageRoute
           ? _screens.lastWhereOrNull(
               (s) =>
                   s.screenName ==
@@ -97,8 +97,8 @@ class ScreenTrackingObserver extends NavigatorObserver {
 
   // Add API log helper
   void addApiLog(ApiLog log, {ScreenLog? currentScreen}) {
-    if ((currentScreen ?? _currentScreen) != null) {
-      (currentScreen ?? _currentScreen)!.apiLogs.add(log);
+    if ((currentScreen ?? currentScreen) != null) {
+      (currentScreen ?? currentScreen)!.apiLogs.add(log);
     }
   }
 }

@@ -40,18 +40,19 @@ class SmartDailyReportBuilder {
       buffer.writeln('Error Details:');
       for (var i = 0; i < errors.length; i++) {
         buffer.writeln('${i + 1}. ${errors[i].message}');
+        buffer.writeln('  => ${errors[i].exception}');
       }
       buffer.writeln();
     }
 
-    // Warnings
-    if (warnings.isNotEmpty) {
-      buffer.writeln('Warning Details:');
-      for (var i = 0; i < warnings.length; i++) {
-        buffer.writeln('${i + 1}. ${warnings[i].message}');
-      }
-      buffer.writeln();
-    }
+    // // Warnings
+    // if (warnings.isNotEmpty) {
+    //   buffer.writeln('Warning Details:');
+    //   for (var i = 0; i < warnings.length; i++) {
+    //     buffer.writeln('${i + 1}. ${warnings[i].message}');
+    //   }
+    //   buffer.writeln();
+    // }
 
     // Performance
     if (slowApis.isNotEmpty) {

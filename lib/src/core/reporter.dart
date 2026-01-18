@@ -5,19 +5,23 @@ import 'package:flutter/foundation.dart';
 import 'package:log_reporter/app_log_reporter.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
+import '../../dependancy_injection.dart' as di;
+
 class AppLogReporter {
   // ------------------------------
   // Package fields
   // ------------------------------
   static late Talker _talker;
   static late LogReporterConfig _config;
-  static final ScreenTrackingObserver screenObserver = ScreenTrackingObserver();
+  static late ScreenTrackingObserver _screenObserver;
 
   // ------------------------------
   // Initialize package
   // ------------------------------
-  static void init({required LogReporterConfig config}) {
+  static void init({required LogReporterConfig config}) async {
     _config = config;
+
+    await di.init();
 
     // Initialize Talker with history
     _talker = TalkerFlutter.init(
@@ -27,6 +31,7 @@ class AppLogReporter {
         maxHistoryItems: config.maxHistoryItems,
       ),
     );
+    _screenObserver = di.sl<ScreenTrackingObserver>();
 
     // Set up Flutter error catching if enabled
     if (_config.enableFlutterErrorCatching) {
@@ -39,6 +44,7 @@ class AppLogReporter {
   // ------------------------------
   static Talker get talker => _talker;
   static LogReporterConfig get config => _config;
+  static ScreenTrackingObserver get screenObserver => _screenObserver;
 
   // ------------------------------
   // Flutter Error Catching
@@ -49,17 +55,19 @@ class AppLogReporter {
     FlutterError.onError = (FlutterErrorDetails details) {
       // Create structured error log
       final errorLog = ErrorLog(
-       generatedMessage: details.exceptionAsString(),
+        generatedMessage: details.exceptionAsString(),
         stackTrace: details.stack,
-        type: ErrorLogType.exeption, time: null, apiLog: null, screenLog: null,
+        type: ErrorLogType.exeption,
+        time: null,
+        apiLog: null,
+        screenLog: null,
       );
 
       // Attach to current screen if exists
-      screenObserver.addError(errorLog);
 
       // Log to Talker
       talker.error(
-        '[MyAppLog][Flutter Error] ${details.exceptionAsString()}',
+        '[Flutter Error]-[${screenObserver.currentScreen?.screenName}]- ${details.exceptionAsString()}',
         details.exception,
         details.stack,
       );
@@ -75,15 +83,21 @@ class AppLogReporter {
     // Catch async errors globally
     runZonedGuarded(() {}, (error, stackTrace) {
       final errorLog = ErrorLog(
-       generatedMessage: error.toString(),
+        generatedMessage: error.toString(),
         stackTrace: stackTrace,
-        type: ErrorLogType.exeption, time: null, apiLog: null, screenLog: null,
+        type: ErrorLogType.exeption,
+        time: null,
+        apiLog: null,
+        screenLog: null,
       );
-
 
       screenObserver.addError(errorLog);
 
-      talker.error('[MyAppLog][Async Error] $error', error, stackTrace);
+      talker.error(
+        '[MyAppLog]-[${screenObserver.currentScreen?.screenName}]-[Async Error] $error',
+        error,
+        stackTrace,
+      );
     });
   }
 }
