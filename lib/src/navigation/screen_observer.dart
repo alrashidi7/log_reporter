@@ -39,20 +39,6 @@ class ScreenTrackingObserver extends NavigatorObserver {
 
   List<ScreenLog> get screens => _screens;
 
-  // Call this to log errors
-  void addError(ErrorLog error, {ScreenLog? currentScreen}) {
-    if ((currentScreen ?? currentScreen) != null) {
-      (currentScreen ?? currentScreen)!.errors.add(error);
-    } else {
-      // optional: log errors without screen
-      AppLogReporter.talker.error(
-        '[No Screen] ${error.exeptionMsg}',
-
-        error.stackTrace,
-      );
-    }
-  }
-
   @override
   void didPush(Route route, Route? previousRoute) {
     if (route is MaterialPageRoute) {
@@ -92,13 +78,6 @@ class ScreenTrackingObserver extends NavigatorObserver {
                       previousRoute.builder.runtimeType.toString()),
             )
           : null;
-    }
-  }
-
-  // Add API log helper
-  void addApiLog(ApiLog log, {ScreenLog? currentScreen}) {
-    if ((currentScreen ?? currentScreen) != null) {
-      (currentScreen ?? currentScreen)!.apiLogs.add(log);
     }
   }
 }

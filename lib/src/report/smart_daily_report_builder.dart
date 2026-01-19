@@ -41,27 +41,28 @@ class SmartDailyReportBuilder {
       for (var i = 0; i < errors.length; i++) {
         buffer.writeln('${i + 1}. ${errors[i].message}');
         buffer.writeln('  => ${errors[i].exception}');
+      buffer.writeln();
       }
       buffer.writeln();
     }
 
-    // // Warnings
-    // if (warnings.isNotEmpty) {
-    //   buffer.writeln('Warning Details:');
-    //   for (var i = 0; i < warnings.length; i++) {
-    //     buffer.writeln('${i + 1}. ${warnings[i].message}');
+    // Warnings
+    if (warnings.isNotEmpty) {
+      buffer.writeln('Warning Details:');
+      for (var i = 0; i < warnings.length; i++) {
+        buffer.writeln('${i + 1}. ${warnings[i].message}');
+      }
+      buffer.writeln();
+    }
+
+    // // Performance
+    // if (slowApis.isNotEmpty) {
+    //   buffer.writeln('Performance Issues:');
+    //   for (final log in slowApis) {
+    //     buffer.writeln('• ${log.message}');
     //   }
     //   buffer.writeln();
     // }
-
-    // Performance
-    if (slowApis.isNotEmpty) {
-      buffer.writeln('Performance Issues:');
-      for (final log in slowApis) {
-        buffer.writeln('• ${log.message}');
-      }
-      buffer.writeln();
-    }
 
     // Conclusion
     buffer.writeln('Conclusion:');

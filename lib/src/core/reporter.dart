@@ -49,18 +49,6 @@ class AppLogReporter {
     final FlutterExceptionHandler? defaultOnError = FlutterError.onError;
 
     FlutterError.onError = (FlutterErrorDetails details) {
-      // Create structured error log
-      final errorLog = ErrorLog(
-        exeptionMsg: details.exceptionAsString(),
-        stackTrace: details.stack,
-        type: ErrorLogType.exeption,
-        time: null,
-        apiLog: null,
-        screenLog: null,
-      );
-
-      // Attach to current screen if exists
-
       // Log to Talker
       talker.error(
         '[Flutter Error]-[${screenObserver.currentScreen?.screenName}]- ${details.exceptionAsString()}',
@@ -86,12 +74,9 @@ class AppLogReporter {
         apiLog: null,
         screenLog: null,
       );
-
-      screenObserver.addError(errorLog);
-
       talker.error(
-        '[MyAppLog]-[${screenObserver.currentScreen?.screenName}]-[Async Error] $error',
-        error,
+        '[MyAppLog]-[${screenObserver.currentScreen?.screenName}]-[Async Error]',
+        error.toString(),
         stackTrace,
       );
     });

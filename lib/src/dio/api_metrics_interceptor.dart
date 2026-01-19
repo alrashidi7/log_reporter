@@ -1,12 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:log_reporter/app_log_reporter.dart';
 
-import 'package:talker_flutter/talker_flutter.dart';
-
 class ApiMetricsInterceptor extends Interceptor {
   final ScreenTrackingObserver screenObserver;
+  final List<int> statusCodeIgnore;
 
-  ApiMetricsInterceptor(this.screenObserver);
+  ApiMetricsInterceptor(this.screenObserver, {required this.statusCodeIgnore});
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
@@ -40,6 +39,7 @@ class ApiMetricsInterceptor extends Interceptor {
       statusCode: statusCode,
       path: options.path,
       screenName: screenObserver.currentScreen?.screenName,
+      statusCodeIgnore: statusCodeIgnore,
     );
 
     // Create structured API log
@@ -52,7 +52,6 @@ class ApiMetricsInterceptor extends Interceptor {
     );
 
     // // Attach API log to current screen
-    // screenObserver.addApiLog(apiLog);
     final errorLog = ErrorLog(
       stackTrace: error?.stackTrace,
       time: null,
@@ -66,29 +65,17 @@ class ApiMetricsInterceptor extends Interceptor {
       if (!shouldLog) {
         return; // 🚫 Skip duplicate unauthorized logs
       }
-      //  = ErrorLog(
-      //   message: error.message ?? '',
-      //   dioException: error,
-      //   stackTrace: error.stackTrace,
-      //   type: 'api_error',
-      // );
 
       // Log with Talker
       talker.error(
-        '[API ERROR]-[${screenObserver.currentScreen?.screenName}]- ${options.method} ${options.path} (${duration}ms)',
+        '[API ERROR-${options.method}]-[${screenObserver.currentScreen?.screenName}]- ${options.path} (${duration}ms) at ${start.toString()}',
         errorLog.generateErrorMsg(),
         error.stackTrace,
       );
     } else {
-      // Normal API log
-      // talker.log(
-      //   '[API]-[${screenObserver.currentScreen?.screenName}]- ${options.method} ${options.path} (${duration}ms)',
-      //   logLevel: isSlow ? LogLevel.warning : LogLevel.info,
-      // );
-
       if (isSlow) {
         talker.warning(
-          '[Slow API]-[${screenObserver.currentScreen?.screenName}]- ${options.method} ${options.path} - ${duration}ms',
+          '[Slow API-${options.method}]-[${screenObserver.currentScreen?.screenName}]- ${options.path} - ${duration}ms at ${start.toString()}',
           errorLog.generateErrorMsg(),
         );
       }
@@ -103,22 +90,23 @@ class ApiErrorDeduplicator {
     required int? statusCode,
     required String path,
     required String? screenName,
+    required List<int> statusCodeIgnore,
   }) {
     if (statusCode == null) return true;
 
     // Only deduplicate authorization errors
-    if (statusCode != 401 && statusCode != 403) {
+    if (statusCodeIgnore.contains(statusCode)) {
+      return false;
+    } else {
+      final fingerprint = '$statusCode|$path|$screenName';
+
+      if (_loggedErrors.contains(fingerprint)) {
+        return false; // already logged
+      }
+
+      _loggedErrors.add(fingerprint);
       return true;
     }
-
-    final fingerprint = '$statusCode|$path|$screenName';
-
-    if (_loggedErrors.contains(fingerprint)) {
-      return false; // already logged
-    }
-
-    _loggedErrors.add(fingerprint);
-    return true;
   }
 
   static void clear() {

@@ -6,7 +6,6 @@ class ScreenLog {
   final String screenName;
   final DateTime openedAt;
   DateTime? closedAt;
-  final List<ApiLog> apiLogs;
   final List<ErrorLog> errors;
   String? screenSummary;
 
@@ -17,8 +16,7 @@ class ScreenLog {
     List<ApiLog>? apiLogs,
     List<ErrorLog>? errors,
     this.screenSummary,
-  }) : apiLogs = apiLogs ?? [],
-       errors = errors ?? [];
+  }) : errors = errors ?? [];
 
   int? get durationMs => closedAt?.difference(openedAt).inMilliseconds;
 }
@@ -51,9 +49,10 @@ class ApiLog {
 
       String apiLogError = "";
       for (var element in logData.entries) {
-        apiLogError = "$apiLogError \n ${element.key}:${element.value}";
+        apiLogError =
+            "$apiLogError \n ---------\n ${element.key}:${element.value}";
       }
-      message = "$message \n $apiLogError";
+      message = "$message \n $apiLogError ---------\n";
     }
     return message;
   }
