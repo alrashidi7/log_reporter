@@ -35,6 +35,13 @@ class ApiMetricsInterceptor extends Interceptor {
     final isSlow = duration > AppLogReporter.config.slowApiThresholdMs;
     final talker = AppLogReporter.talker;
 
+    // 🔑 Deduplication check
+    final shouldLog = ApiErrorDeduplicator.shouldLog(
+      statusCode: statusCode,
+      path: options.path,
+      screenName: screenObserver.currentScreen?.screenName,
+    );
+
     // Create structured API log
     final apiLog = ApiLog(
       method: options.method,
@@ -44,8 +51,8 @@ class ApiMetricsInterceptor extends Interceptor {
       dioException: error,
     );
 
-    // Attach API log to current screen
-    screenObserver.addApiLog(apiLog);
+    // // Attach API log to current screen
+    // screenObserver.addApiLog(apiLog);
     final errorLog = ErrorLog(
       stackTrace: error?.stackTrace,
       time: null,
@@ -56,6 +63,9 @@ class ApiMetricsInterceptor extends Interceptor {
 
     // Also capture errors into structured error logs
     if (error != null) {
+      if (!shouldLog) {
+        return; // 🚫 Skip duplicate unauthorized logs
+      }
       //  = ErrorLog(
       //   message: error.message ?? '',
       //   dioException: error,
@@ -83,5 +93,35 @@ class ApiMetricsInterceptor extends Interceptor {
         );
       }
     }
+  }
+}
+
+class ApiErrorDeduplicator {
+  static final Set<String> _loggedErrors = {};
+
+  static bool shouldLog({
+    required int? statusCode,
+    required String path,
+    required String? screenName,
+  }) {
+    if (statusCode == null) return true;
+
+    // Only deduplicate authorization errors
+    if (statusCode != 401 && statusCode != 403) {
+      return true;
+    }
+
+    final fingerprint = '$statusCode|$path|$screenName';
+
+    if (_loggedErrors.contains(fingerprint)) {
+      return false; // already logged
+    }
+
+    _loggedErrors.add(fingerprint);
+    return true;
+  }
+
+  static void clear() {
+    _loggedErrors.clear(); // call daily or after email sent
   }
 }
