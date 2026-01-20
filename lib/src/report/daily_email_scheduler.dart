@@ -1,19 +1,18 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:flutter/foundation.dart';
+import 'package:log_reporter/app_log_reporter.dart';
 
 import 'smart_email_reporter.dart';
 
 class DailyEmailScheduler {
-  static Timer? _timer;
+  Timer? _timer;
+  final LogReporterConfig config;
+
+  DailyEmailScheduler({required this.config});
 
   /// Start daily scheduling
   static void start({
-    required String smtpEmail,
-    required String appPassword,
-    required String toEmail,
-    required String appName,
-    required bool isProduction,
     int hour = 20,
     int minute = 0,
     int slowApiThresholdCount = 1,
@@ -34,11 +33,6 @@ class DailyEmailScheduler {
 
   /// Send email immediately
   Future<void> sendNow({
-    required String smtpEmail,
-    required String appPassword,
-    required String toEmail,
-    required String appName,
-    required bool isProduction,
     int slowApiThresholdCount = 1,
     bool notifyOnSlowApiOnly = false,
     bool previewInConsole = true, // <-- new option
@@ -49,17 +43,17 @@ class DailyEmailScheduler {
     );
 
     final emailContent = await reporter.prepareReport(
-      smtpEmail: smtpEmail,
-      appPassword: appPassword,
-      toEmail: toEmail,
-      appName: appName,
-      isProduction: isProduction,
+      smtpEmail: config.smtpEmail,
+      appPassword: config.appPassword,
+      toEmail: config.toEmail,
+      appName: config.appName,
+      isProduction: config.isProduction,
     );
 
     if (previewInConsole && kDebugMode) {
       log('---------------------------');
       log('--- Daily Email Preview ---');
-      log('To: $toEmail');
+      log('To: ${config.toEmail}');
       log('Subject: ${emailContent.subject}');
       log('Body:\n${emailContent.body}');
       log('---------------------------');
@@ -100,11 +94,6 @@ class DailyEmailScheduler {
     _timer?.cancel();
     _timer = Timer(duration, () async {
       await sendNow(
-        smtpEmail: smtpEmail,
-        appPassword: appPassword,
-        toEmail: toEmail,
-        appName: appName,
-        isProduction: isProduction,
         slowApiThresholdCount: slowApiThresholdCount,
         notifyOnSlowApiOnly: notifyOnSlowApiOnly,
         previewInConsole: false, // don't preview on scheduled run
