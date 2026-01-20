@@ -92,14 +92,11 @@ class ApiErrorDeduplicator {
     required String? screenName,
     required List<int> statusCodeIgnore,
   }) {
-    if (statusCode == null) return true;
-
     // Only deduplicate authorization errors
     if (statusCodeIgnore.contains(statusCode)) {
       return false;
     } else {
       final fingerprint = '$statusCode|$path|$screenName';
-
       if (_loggedErrors.contains(fingerprint)) {
         return false; // already logged
       }

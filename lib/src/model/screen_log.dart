@@ -50,9 +50,9 @@ class ApiLog {
       String apiLogError = "";
       for (var element in logData.entries) {
         apiLogError =
-            "$apiLogError \n ---------\n ${element.key}:${element.value}";
+            "$apiLogError \n---------\n ${element.key}:${element.value}";
       }
-      message = "$message \n $apiLogError ---------\n";
+      message = "$message \n $apiLogError \n ---------\n";
     }
     return message;
   }
