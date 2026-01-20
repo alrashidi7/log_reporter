@@ -52,8 +52,8 @@ class SmartDailyReportBuilder {
     // Warnings
     if (warnings.isNotEmpty) {
       buffer.writeln('Warning Details:');
-      for (var i = 0; i < warnings.length; i++) {
-        groupApi(warnings);
+      for (final log in warnings) {
+        buffer.writeln('• ${log.message}');
       }
       buffer.writeln();
     }
@@ -61,9 +61,9 @@ class SmartDailyReportBuilder {
     // // Performance
     // if (slowApis.isNotEmpty) {
     //   buffer.writeln('Performance Issues:');
-    //   for (final log in slowApis) {
-    //     buffer.writeln('• ${log.message}');
-    //   }
+    // for (final log in slowApis) {
+    //   buffer.writeln('• ${log.message}');
+    // }
     //   buffer.writeln();
     // }
 
