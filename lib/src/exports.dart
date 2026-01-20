@@ -12,3 +12,4 @@ export 'report/smart_email_reporter.dart';
 
 export 'ui/reporter_screen.dart';
 export 'model/screen_log.dart';
+export 'model/api_impact_summary.dart';

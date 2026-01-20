@@ -1,5 +1,9 @@
+import 'package:log_reporter/app_log_reporter.dart';
 import 'package:talker/talker.dart';
-import '../core/reporter.dart';
+
+final apiErrorRegex = RegExp(
+  r'\[API ERROR-(\w+)\]-\[(.*?)\]-\s(\/\S+)\s\((\d+)ms\)',
+);
 
 class SmartDailyReportBuilder {
   static String build() {
@@ -38,10 +42,9 @@ class SmartDailyReportBuilder {
     // Errors
     if (errors.isNotEmpty) {
       buffer.writeln('Error Details:');
+
       for (var i = 0; i < errors.length; i++) {
-        buffer.writeln('${i + 1}. ${errors[i].message}');
-        buffer.writeln('  => ${errors[i].exception}');
-      buffer.writeln();
+        groupApi(errors);
       }
       buffer.writeln();
     }
@@ -50,7 +53,7 @@ class SmartDailyReportBuilder {
     if (warnings.isNotEmpty) {
       buffer.writeln('Warning Details:');
       for (var i = 0; i < warnings.length; i++) {
-        buffer.writeln('${i + 1}. ${warnings[i].message}');
+        groupApi(warnings);
       }
       buffer.writeln();
     }

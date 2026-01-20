@@ -66,14 +66,14 @@ class DailyEmailScheduler {
       log('---------------------------');
     }
 
-    await reporter.sendReport(
-      smtpEmail: smtpEmail,
-      appPassword: appPassword,
-      toEmail: toEmail,
-      appName: appName,
-      isProduction: isProduction,
-      report: emailContent.body,
-    );
+    // await reporter.sendReport(
+    //   smtpEmail: smtpEmail,
+    //   appPassword: appPassword,
+    //   toEmail: toEmail,
+    //   appName: appName,
+    //   isProduction: isProduction,
+    //   report: emailContent.body,
+    // );
   }
 
   static void _scheduleNextRun({
