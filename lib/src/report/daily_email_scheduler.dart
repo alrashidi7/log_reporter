@@ -19,21 +19,21 @@ class DailyEmailScheduler {
     int slowApiThresholdCount = 1,
     bool notifyOnSlowApiOnly = false,
   }) {
-    _scheduleNextRun(
-      smtpEmail: smtpEmail,
-      appPassword: appPassword,
-      toEmail: toEmail,
-      hour: hour,
-      minute: minute,
-      slowApiThresholdCount: slowApiThresholdCount,
-      notifyOnSlowApiOnly: notifyOnSlowApiOnly,
-      appName: appName,
-      isProduction: isProduction,
-    );
+    // scheduleNextRun(
+    //   smtpEmail: smtpEmail,
+    //   appPassword: appPassword,
+    //   toEmail: toEmail,
+    //   hour: hour,
+    //   minute: minute,
+    //   slowApiThresholdCount: slowApiThresholdCount,
+    //   notifyOnSlowApiOnly: notifyOnSlowApiOnly,
+    //   appName: appName,
+    //   isProduction: isProduction,
+    // );
   }
 
   /// Send email immediately
-  static Future<void> sendNow({
+  Future<void> sendNow({
     required String smtpEmail,
     required String appPassword,
     required String toEmail,
@@ -76,7 +76,7 @@ class DailyEmailScheduler {
     // );
   }
 
-  static void _scheduleNextRun({
+  void scheduleNextRun({
     required String smtpEmail,
     required String appPassword,
     required String toEmail,
@@ -111,7 +111,7 @@ class DailyEmailScheduler {
       );
 
       // Reschedule for next day
-      _scheduleNextRun(
+      scheduleNextRun(
         smtpEmail: smtpEmail,
         appPassword: appPassword,
         toEmail: toEmail,

@@ -47,43 +47,11 @@ class SmartEmailReporter {
     required String appName,
     required bool isProduction,
   }) async {
-    final logs = AppLogReporter.talker.history;
-
-    // Filter today's logs
-    final today = logs.where((log) => _isToday(log.time)).toList();
-
-    // Errors and slow APIs
-    final errors = today.where((e) => e.logLevel == LogLevel.error).toList();
-    final slowApis = today
-        .where(
-          (e) =>
-              e.logLevel == LogLevel.warning &&
-              (e.message ?? '').contains('Slow API'),
-        )
-        .toList();
-
-    // Decide if email is needed
-    final shouldSend =
-        errors.isNotEmpty ||
-        (notifyOnSlowApiOnly && slowApis.length >= slowApiThresholdCount);
-
-    if (!shouldSend) {
-      return EmailContent(subject: '', body: '');
-    }
-
-    // Build professional report
     final reportBody = SmartDailyReportBuilder.build();
 
     return EmailContent(
       subject: '[$appName] Daily Log Report',
       body: reportBody,
     );
-  }
-
-  bool _isToday(DateTime time) {
-    final now = DateTime.now();
-    return time.year == now.year &&
-        time.month == now.month &&
-        time.day == now.day;
   }
 }
