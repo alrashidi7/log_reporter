@@ -17,24 +17,27 @@ class SmartDailyReportBuilder {
     List<TalkerData> warningListAfterFilter = [];
     for (var element in warnings) {
       final match = apiErrorRegex.firstMatch(element.message ?? '');
-      if (match == null) continue;
-      final screen = match.group(2)!;
-      final endpoint = match.group(3)!;
-      final duration = int.parse(match.group(4)!);
-      var itemFound = warningListAfterFilter.firstWhereOrNull(
-        (element) => (element.message ?? "").contains(endpoint),
-      );
-      if (itemFound.runtimeType != Null) {
+      if (match == null) {
         warningListAfterFilter.add(element);
       } else {
-        final matchitemFound = apiErrorRegex.firstMatch(
-          itemFound?.message ?? '',
+        final screen = match.group(2)!;
+        final endpoint = match.group(3)!;
+        final duration = int.parse(match.group(4)!);
+        var itemFound = warningListAfterFilter.firstWhereOrNull(
+          (element) => (element.message ?? "").contains(endpoint),
         );
-        final durationItemFound = int.parse(matchitemFound?.group(4) ?? "0");
-        if (duration > durationItemFound) {
-          warningListAfterFilter.remove(itemFound);
-
+        if (itemFound.runtimeType != Null) {
           warningListAfterFilter.add(element);
+        } else {
+          final matchitemFound = apiErrorRegex.firstMatch(
+            itemFound?.message ?? '',
+          );
+          final durationItemFound = int.parse(matchitemFound?.group(4) ?? "0");
+          if (duration > durationItemFound) {
+            warningListAfterFilter.remove(itemFound);
+
+            warningListAfterFilter.add(element);
+          }
         }
       }
     }
