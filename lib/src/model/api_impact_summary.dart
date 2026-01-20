@@ -5,7 +5,7 @@ final apiErrorRegex = RegExp(
 );
 
 final apiSlowRegex = RegExp(
-  r'\[Slow API-(\w+)\]-\[(.*?)\]-\s(\/\S+)\s\((\d+)ms\)',
+   r'\[Slow API-(\w+)\]-\[(.*?)\]- (.*?) - (\d+)ms',
 );
 
 class ScreenImpact {
