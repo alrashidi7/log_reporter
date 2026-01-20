@@ -1,9 +1,6 @@
+import 'package:collection/collection.dart';
 import 'package:log_reporter/app_log_reporter.dart';
 import 'package:talker/talker.dart';
-
-final apiErrorRegex = RegExp(
-  r'\[API ERROR-(\w+)\]-\[(.*?)\]-\s(\/\S+)\s\((\d+)ms\)',
-);
 
 class SmartDailyReportBuilder {
   static String build() {
@@ -17,7 +14,31 @@ class SmartDailyReportBuilder {
         .where((e) => e.logLevel == LogLevel.warning)
         .toList();
 
-    final slowApis = warnings
+    List<TalkerData> warningListAfterFilter = [];
+    for (var element in warnings) {
+      final match = apiErrorRegex.firstMatch(element.message ?? '');
+      if (match == null) continue;
+      final screen = match.group(2)!;
+      final endpoint = match.group(3)!;
+      final duration = int.parse(match.group(4)!);
+      var itemFound = warningListAfterFilter.firstWhereOrNull(
+        (element) => (element.message ?? "").contains(endpoint),
+      );
+      if (itemFound.runtimeType != Null) {
+        warningListAfterFilter.add(element);
+      } else {
+        final matchitemFound = apiErrorRegex.firstMatch(
+          itemFound?.message ?? '',
+        );
+        final durationItemFound = int.parse(matchitemFound?.group(4) ?? "0");
+        if (duration > durationItemFound) {
+          warningListAfterFilter.remove(itemFound);
+
+          warningListAfterFilter.add(element);
+        }
+      }
+    }
+    final slowApis = warningListAfterFilter
         .where((e) => (e.message ?? '').contains('Slow API'))
         .toList();
 
@@ -36,7 +57,7 @@ class SmartDailyReportBuilder {
     buffer.writeln('Summary:');
     buffer.writeln('• Total logs: ${today.length}');
     buffer.writeln('• Errors detected: ${errors.length}');
-    buffer.writeln('• Warnings detected: ${warnings.length}');
+    buffer.writeln('• Warnings detected: ${warningListAfterFilter.length}');
     buffer.writeln('• Slow API requests: ${slowApis.length}\n');
 
     // Errors
@@ -50,9 +71,9 @@ class SmartDailyReportBuilder {
     }
 
     // Warnings
-    if (warnings.isNotEmpty) {
+    if (warningListAfterFilter.isNotEmpty) {
       buffer.writeln('Warning Details:');
-      for (final log in warnings) {
+      for (final log in warningListAfterFilter) {
         buffer.writeln('• ${log.message}');
       }
       buffer.writeln();

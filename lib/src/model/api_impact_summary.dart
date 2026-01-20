@@ -1,5 +1,12 @@
-import 'package:log_reporter/app_log_reporter.dart';
 import 'package:talker_flutter/talker_flutter.dart';
+
+final apiErrorRegex = RegExp(
+  r'\[API ERROR-(\w+)\]-\[(.*?)\]-\s(\/\S+)\s\((\d+)ms\)',
+);
+
+final apiSlowRegex = RegExp(
+  r'\[Slow API-(\w+)\]-\[(.*?)\]-\s(\/\S+)\s\((\d+)ms\)',
+);
 
 class ScreenImpact {
   int count = 0;
