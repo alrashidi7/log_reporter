@@ -16,7 +16,10 @@ class AppLogReporter {
   // ------------------------------
   // Initialize package
   // ------------------------------
-  static void init({required LogReporterConfig config}) async {
+  static void init({
+    required LogReporterConfig config,
+    required ScreenTrackingObserver screenObserver,
+  }) async {
     _config = config;
 
     // Initialize Talker with history
@@ -27,7 +30,7 @@ class AppLogReporter {
         maxHistoryItems: config.maxHistoryItems,
       ),
     );
-    _screenObserver = ScreenTrackingObserver();
+    _screenObserver = screenObserver;
 
     // Set up Flutter error catching if enabled
     if (_config.enableFlutterErrorCatching) {

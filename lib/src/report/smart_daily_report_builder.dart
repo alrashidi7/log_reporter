@@ -68,13 +68,11 @@ class SmartDailyReportBuilder {
       buffer.writeln('Error Details:');
 
       for (var i = 0; i < errors.length; i++) {
+        buffer.writeln();
         final message = errors[i].message ?? '';
         final match = apiErrorRegex.firstMatch(message);
         if (match == null) {
-          buffer.writeln(
-            '• ${errors[i].message} StackTrace: ${errors[i].stackTrace}',
-          );
-          buffer.writeln('      ');
+          buffer.writeln('• ${errors[i].message}');
         } else {
           groupApi(errors);
         }
