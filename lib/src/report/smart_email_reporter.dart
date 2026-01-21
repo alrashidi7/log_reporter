@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:log_reporter/app_log_reporter.dart';
-import 'package:log_reporter/src/core/app_context_handler.dart';
 
 class EmailContent {
   final String subject;
@@ -13,7 +12,7 @@ class EmailContent {
 
 class SmartEmailReporter {
   final LogReporterConfig config;
-  final AppContext appContext;
+  final LoggerAppContext appContext;
 
   SmartEmailReporter({required this.config, required this.appContext});
   Future<void> sendReport() async {

@@ -1,10 +1,10 @@
 import 'package:collection/collection.dart';
 import 'package:log_reporter/app_log_reporter.dart';
-import 'package:log_reporter/src/core/app_context_handler.dart';
+
 import 'package:talker/talker.dart';
 
 class SmartDailyReportBuilder {
-  final AppContext appContext;
+  final LoggerAppContext appContext;
 
   SmartDailyReportBuilder({required this.appContext});
   String _pretty(String key) => key.replaceAll('_', ' ').toUpperCase();

@@ -3,6 +3,7 @@ export 'core/reporter_config.dart';
 export 'core/decision_engine.dart';
 export 'core/log_levels.dart';
 export 'core/app_lifecycle_handler.dart';
+export 'core/app_context_handler.dart';
 
 export 'dio/api_metrics_interceptor.dart';
 export 'navigation/screen_observer.dart';

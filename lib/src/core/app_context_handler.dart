@@ -4,10 +4,10 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart';
 
-class AppContext {
-  static final AppContext _instance = AppContext._internal();
-  factory AppContext() => _instance;
-  AppContext._internal();
+class LoggerAppContext {
+  static final LoggerAppContext _instance = LoggerAppContext._internal();
+  factory LoggerAppContext() => _instance;
+  LoggerAppContext._internal();
 
   bool _initialized = false;
 
