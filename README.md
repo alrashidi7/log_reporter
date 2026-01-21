@@ -54,4 +54,10 @@ dependencies:
 
 
 
+in main file do this 
+  WidgetsBinding.instance.addObserver(AppLifecycleHandler());
+
+
+
+
 

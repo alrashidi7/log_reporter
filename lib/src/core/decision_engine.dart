@@ -30,7 +30,7 @@ class DecisionEngine {
   final LogReporterConfig config;
 
   DecisionEngine({required this.config});
-  evaluate() async {
+  Future<void> evaluate() async {
     DateTime dateNow = DateTime.now();
     DateTime yesterDayDate = dateNow.subtract(Duration(days: 1));
     var history = AppLogReporter.talker.history;
