@@ -3,16 +3,12 @@ import 'package:log_reporter/app_log_reporter.dart';
 import 'package:talker/talker.dart';
 
 class SmartDailyReportBuilder {
-  static String build() {
+  String? build() {
     final logs = AppLogReporter.talker.history;
 
-    final today = logs.where((e) => _isToday(e.time)).toList();
+    final errors = logs.where((e) => e.logLevel == LogLevel.error).toList();
 
-    final errors = today.where((e) => e.logLevel == LogLevel.error).toList();
-
-    final warnings = today
-        .where((e) => e.logLevel == LogLevel.warning)
-        .toList();
+    final warnings = logs.where((e) => e.logLevel == LogLevel.warning).toList();
 
     List<TalkerData> warningListAfterFilter = [];
     for (var element in warnings) {
@@ -57,27 +53,29 @@ class SmartDailyReportBuilder {
     }
 
     // Summary
+    buffer.writeln("------------------------------");
     buffer.writeln('Summary:');
-    buffer.writeln('• Total logs: ${today.length}');
+    buffer.writeln('• Total logs: ${logs.length}');
     buffer.writeln('• Errors detected: ${errors.length}');
     buffer.writeln('• Warnings detected: ${warningListAfterFilter.length}');
-    buffer.writeln('• Slow API requests: ${slowApis.length}\n');
-
+    buffer.writeln('• Slow API requests: ${slowApis.length}');
+    buffer.writeln("------------------------------");
     // Errors
     if (errors.isNotEmpty) {
       buffer.writeln('Error Details:');
-
       for (var i = 0; i < errors.length; i++) {
-        buffer.writeln();
         final message = errors[i].message ?? '';
         final match = apiErrorRegex.firstMatch(message);
         if (match == null) {
           buffer.writeln('• ${errors[i].message}');
-        } else {
-          groupApi(errors);
-        }
+        } else {}
       }
-      buffer.writeln();
+      if (groupApi(errors).isNotEmpty) {
+        groupApi(errors).forEach(
+          (element) => buffer.writeln(element.generateTheApiImpactSummary()),
+        );
+      }
+      buffer.writeln("------------------------------");
     }
 
     // Warnings
@@ -86,7 +84,7 @@ class SmartDailyReportBuilder {
       for (final log in warningListAfterFilter) {
         buffer.writeln('• ${log.message}');
       }
-      buffer.writeln();
+      buffer.writeln("------------------------------");
     }
 
     // // Performance
@@ -105,14 +103,11 @@ class SmartDailyReportBuilder {
     } else {
       buffer.writeln('Recommended to investigate the issues listed above.');
     }
-
-    return buffer.toString();
-  }
-
-  static bool _isToday(DateTime time) {
-    final now = DateTime.now();
-    return time.year == now.year &&
-        time.month == now.month &&
-        time.day == now.day;
+    if (errors.isEmpty && slowApis.isEmpty) {
+      AppLogReporter.talker.cleanHistory();
+      return null;
+    } else {
+      return buffer.toString();
+    }
   }
 }

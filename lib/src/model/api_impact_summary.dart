@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:talker_flutter/talker_flutter.dart';
 
 final apiErrorRegex = RegExp(
@@ -72,7 +73,7 @@ class ApiImpactSummary {
   }
 }
 
-Map<String, ApiImpactSummary> groupApi(List<TalkerData> errorLogs) {
+List<ApiImpactSummary> groupApi(List<TalkerData> errorLogs) {
   final Map<String, ApiImpactSummary> result = {};
 
   for (final log in errorLogs) {
@@ -106,6 +107,7 @@ Map<String, ApiImpactSummary> groupApi(List<TalkerData> errorLogs) {
       }
     }
   }
-
-  return result;
+  List<ApiImpactSummary> list = [];
+  list = result.values.toList();
+  return list;
 }

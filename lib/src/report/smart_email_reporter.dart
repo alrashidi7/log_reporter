@@ -1,5 +1,7 @@
+import 'dart:developer';
+
+import 'package:flutter/foundation.dart';
 import 'package:log_reporter/app_log_reporter.dart';
-import 'package:talker_flutter/talker_flutter.dart';
 
 class EmailContent {
   final String subject;
@@ -9,49 +11,38 @@ class EmailContent {
 }
 
 class SmartEmailReporter {
-  /// Threshold for slow APIs to trigger email
-  final int slowApiThresholdCount;
+  Future<void> sendReport({required LogReporterConfig config}) async {
+    final emailContent = await prepareReport(config: config);
 
-  /// If true, will send email even if only slow APIs exist
-  final bool notifyOnSlowApiOnly;
-
-  SmartEmailReporter({
-    this.slowApiThresholdCount = 1,
-    this.notifyOnSlowApiOnly = false,
-  });
-
-  Future<void> sendReport({
-    required String smtpEmail,
-    required String appPassword,
-    required String toEmail,
-    required String appName,
-    required bool isProduction,
-    required String report,
-  }) async {
-    // Send email
-    await ReportSender.sendEmail(
-      smtpEmail: smtpEmail,
-      appPassword: appPassword,
-      toEmail: toEmail,
-      report: report,
-      appName: appName,
-      isProduction: isProduction,
-    );
+    if (emailContent.runtimeType != Null) {
+      if (kDebugMode) {
+        log('---------------------------');
+        log('--- Daily Email Preview ---');
+        log('To: ${config.toEmail}');
+        log('Subject: ${emailContent?.subject}');
+        log('Body:\n${emailContent?.body}');
+        log('---------------------------');
+        log('---------------------------');
+      }
+      // Send email
+      await ReportSender.sendEmail(
+        report: emailContent?.body ?? "",
+        config: config,
+      );
+    } else {}
   }
 
   /// Prepare the email report and return EmailContent
-  Future<EmailContent> prepareReport({
-    required String smtpEmail,
-    required String appPassword,
-    required String toEmail,
-    required String appName,
-    required bool isProduction,
+  Future<EmailContent?> prepareReport({
+    required LogReporterConfig config,
   }) async {
-    final reportBody = SmartDailyReportBuilder.build();
+    final reportBody = SmartDailyReportBuilder().build();
 
-    return EmailContent(
-      subject: '[$appName] Daily Log Report',
-      body: reportBody,
-    );
+    return reportBody.runtimeType == Null
+        ? null
+        : EmailContent(
+            subject: '[${config.appName}] Daily Log Report',
+            body: reportBody!,
+          );
   }
 }
