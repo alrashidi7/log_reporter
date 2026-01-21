@@ -34,7 +34,8 @@ class AppLogReporter {
     );
     _screenObserver = screenObserver;
 
-    await loggerAppContext.init(isProduction: config.isProduction);
+    loggerAppContext.init(isProduction: config.isProduction);
+
     _loggerAppContext = loggerAppContext;
 
     // Set up Flutter error catching if enabled
@@ -49,7 +50,7 @@ class AppLogReporter {
   static Talker get talker => _talker;
   static LogReporterConfig get config => _config;
   static ScreenTrackingObserver get screenObserver => _screenObserver;
-  static LoggerAppContext get loggerAppContext => _loggerAppContext;
+  static LoggerAppContext get loggerContext => _loggerAppContext;
 
   // ------------------------------
   // Flutter Error Catching
