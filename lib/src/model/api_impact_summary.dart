@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 final apiErrorRegex = RegExp(
@@ -36,22 +37,25 @@ class ApiImpactSummary {
     }
 
     // Find slowest failure across all screens
-    final slowest = screens.values
+    final slowestLogs = screens.values
         .where((e) => e.slowestLog != null)
         .map((e) => e.slowestLog!)
-        .reduce((a, b) {
-          final d1 = _extractDuration(a);
-          final d2 = _extractDuration(b);
-          return d1 > d2 ? a : b;
-        });
+        .toList();
 
-    buffer.writeln('Slowest Failure Details:');
-    buffer.writeln('Screen: ${_extractScreen(slowest)}');
-    buffer.writeln('Duration: ${_extractDuration(slowest)} ms');
-    buffer.writeln('Time: ${slowest.time}\n');
-    if (slowest.exception != null) {
-      buffer.writeln('Exception:');
-      buffer.writeln(slowest.exception.toString());
+    if (slowestLogs.isNotEmpty) {
+      final slowest = slowestLogs.reduce((a, b) {
+        return _extractDuration(a) > _extractDuration(b) ? a : b;
+      });
+
+      buffer.writeln('Slowest Failure Details:');
+      buffer.writeln('Screen: ${_extractScreen(slowest)}');
+      buffer.writeln('Duration: ${_extractDuration(slowest)} ms');
+      buffer.writeln('Time: ${slowest.time}');
+
+      if (slowest.exception != null) {
+        buffer.writeln('\nException:');
+        buffer.writeln(slowest.exception.toString());
+      }
     }
 
     return buffer.toString();
@@ -72,9 +76,11 @@ Map<String, ApiImpactSummary> groupApi(List<TalkerData> errorLogs) {
   final Map<String, ApiImpactSummary> result = {};
 
   for (final log in errorLogs) {
-    final match = apiErrorRegex.firstMatch(log.message ?? '');
+    final message = log.message ?? '';
+    final match = apiErrorRegex.firstMatch(message);
     if (match == null) {
-      // result.putIfAbsent(endpoint, () => ApiImpactSummary(endpoint));
+      debugPrint('❌ NOT MATCHED:\n$message\n');
+      continue;
     } else {
       final screen = match.group(2)!;
       final endpoint = match.group(3)!;
