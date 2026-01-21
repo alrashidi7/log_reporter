@@ -1,8 +1,13 @@
 import 'package:collection/collection.dart';
 import 'package:log_reporter/app_log_reporter.dart';
+import 'package:log_reporter/src/core/app_context_handler.dart';
 import 'package:talker/talker.dart';
 
 class SmartDailyReportBuilder {
+  final AppContext appContext;
+
+  SmartDailyReportBuilder({required this.appContext});
+  String _pretty(String key) => key.replaceAll('_', ' ').toUpperCase();
   String? build() {
     final logs = AppLogReporter.talker.history;
 
@@ -51,7 +56,21 @@ class SmartDailyReportBuilder {
     } else {
       buffer.writeln('Overall Status: ⚠️ Attention Required\n');
     }
+    final context = appContext.data;
 
+    buffer.writeln("------------------------------");
+    buffer.writeln('📱 App Information');
+    buffer.writeln('• App: ${context['app_name']}');
+    buffer.writeln(
+      '• Version: ${context['version']} (${context['build_number']})',
+    );
+    buffer.writeln('• Environment: ${context['environment']}');
+
+    buffer.writeln('\n📲 Device Information');
+    final device = context['device'] as Map;
+    device.forEach((k, v) {
+      buffer.writeln('• ${_pretty(k)}: $v');
+    });
     // Summary
     buffer.writeln("------------------------------");
     buffer.writeln('Summary:');

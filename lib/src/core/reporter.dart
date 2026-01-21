@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import 'package:log_reporter/app_log_reporter.dart';
+import 'package:log_reporter/src/core/app_context_handler.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 class AppLogReporter {
@@ -12,6 +13,7 @@ class AppLogReporter {
   static late Talker _talker;
   static late LogReporterConfig _config;
   static late ScreenTrackingObserver _screenObserver;
+  static late AppContext _appContext;
 
   // ------------------------------
   // Initialize package
@@ -19,8 +21,10 @@ class AppLogReporter {
   static void init({
     required LogReporterConfig config,
     required ScreenTrackingObserver screenObserver,
+    required AppContext appContext,
   }) async {
     _config = config;
+    _appContext = appContext;
 
     // Initialize Talker with history
     _talker = TalkerFlutter.init(
