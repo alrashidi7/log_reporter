@@ -68,7 +68,14 @@ class SmartDailyReportBuilder {
       buffer.writeln('Error Details:');
 
       for (var i = 0; i < errors.length; i++) {
-        groupApi(errors);
+        final message = errors[i].message ?? '';
+        final match = apiErrorRegex.firstMatch(message);
+        if (match == null) {
+          buffer.writeln('• ${errors[i].message} ');
+          buffer.writeln('     ${errors[i].message} ');
+        } else {
+          groupApi(errors);
+        }
       }
       buffer.writeln();
     }

@@ -85,7 +85,6 @@ Map<String, ApiImpactSummary> groupApi(List<TalkerData> errorLogs) {
       final screen = match.group(2)!;
       final endpoint = match.group(3)!;
       final duration = int.parse(match.group(4)!);
-
       final apiSummary = result.putIfAbsent(
         endpoint,
         () => ApiImpactSummary(endpoint),
