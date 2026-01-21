@@ -28,8 +28,9 @@ class DecisionResult {
 /// The brain 🧠
 class DecisionEngine {
   final LogReporterConfig config;
+  final SmartEmailReporter reporter;
 
-  DecisionEngine({required this.config});
+  DecisionEngine({required this.config, required this.reporter});
   Future<void> evaluate() async {
     DateTime dateNow = DateTime.now();
     DateTime yesterDayDate = dateNow.subtract(Duration(days: 1));
@@ -76,7 +77,7 @@ class DecisionEngine {
       // );
     }
     if (haveLogCritical || yesterDayList.isNotEmpty) {
-      await SmartEmailReporter().sendReport(config: config);
+      await reporter.sendReport();
     }
   }
 }

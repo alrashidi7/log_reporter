@@ -11,8 +11,11 @@ class EmailContent {
 }
 
 class SmartEmailReporter {
-  Future<void> sendReport({required LogReporterConfig config}) async {
-    final emailContent = await prepareReport(config: config);
+  final LogReporterConfig config;
+
+  SmartEmailReporter({required this.config});
+  Future<void> sendReport() async {
+    final emailContent = await prepareReport();
 
     if (emailContent.runtimeType != Null) {
       if (kDebugMode) {
@@ -33,9 +36,7 @@ class SmartEmailReporter {
   }
 
   /// Prepare the email report and return EmailContent
-  Future<EmailContent?> prepareReport({
-    required LogReporterConfig config,
-  }) async {
+  Future<EmailContent?> prepareReport() async {
     final reportBody = SmartDailyReportBuilder().build();
 
     return reportBody.runtimeType == Null
