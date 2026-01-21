@@ -12,7 +12,7 @@ class AppLogReporter {
   static late Talker _talker;
   static late LogReporterConfig _config;
   static late ScreenTrackingObserver _screenObserver;
-  static late LoggerAppContext _appContext;
+  static late LoggerAppContext _loggerAppContext;
 
   // ------------------------------
   // Initialize package
@@ -20,10 +20,9 @@ class AppLogReporter {
   static void init({
     required LogReporterConfig config,
     required ScreenTrackingObserver screenObserver,
-    required LoggerAppContext appContext,
+    required LoggerAppContext loggerAppContext,
   }) async {
     _config = config;
-    _appContext = appContext;
 
     // Initialize Talker with history
     _talker = TalkerFlutter.init(
@@ -34,6 +33,9 @@ class AppLogReporter {
       ),
     );
     _screenObserver = screenObserver;
+
+    await loggerAppContext.init(isProduction: config.isProduction);
+    _loggerAppContext = loggerAppContext;
 
     // Set up Flutter error catching if enabled
     if (_config.enableFlutterErrorCatching) {
@@ -47,6 +49,7 @@ class AppLogReporter {
   static Talker get talker => _talker;
   static LogReporterConfig get config => _config;
   static ScreenTrackingObserver get screenObserver => _screenObserver;
+  static LoggerAppContext get loggerAppContext => _loggerAppContext;
 
   // ------------------------------
   // Flutter Error Catching
