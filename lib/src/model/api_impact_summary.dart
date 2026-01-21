@@ -1,12 +1,10 @@
 import 'package:talker_flutter/talker_flutter.dart';
 
 final apiErrorRegex = RegExp(
-  r'\[API ERROR-(\w+)\]-\[(.*?)\]-\s(\/\S+)\s\((\d+)ms\)',
+  r'\[API ERROR-(\w+)\]-\[(.*?)\]-\s*(\/[^\s]+)\s*\((\d+)ms\)',
 );
 
-final apiSlowRegex = RegExp(
-   r'\[Slow API-(\w+)\]-\[(.*?)\]- (.*?) - (\d+)ms',
-);
+final apiSlowRegex = RegExp(r'\[Slow API-(\w+)\]-\[(.*?)\]- (.*?) - (\d+)ms');
 
 class ScreenImpact {
   int count = 0;
@@ -75,29 +73,32 @@ Map<String, ApiImpactSummary> groupApi(List<TalkerData> errorLogs) {
 
   for (final log in errorLogs) {
     final match = apiErrorRegex.firstMatch(log.message ?? '');
-    if (match == null) continue;
-    final screen = match.group(2)!;
-    final endpoint = match.group(3)!;
-    final duration = int.parse(match.group(4)!);
+    if (match == null) {
+      // result.putIfAbsent(endpoint, () => ApiImpactSummary(endpoint));
+    } else {
+      final screen = match.group(2)!;
+      final endpoint = match.group(3)!;
+      final duration = int.parse(match.group(4)!);
 
-    final apiSummary = result.putIfAbsent(
-      endpoint,
-      () => ApiImpactSummary(endpoint),
-    );
+      final apiSummary = result.putIfAbsent(
+        endpoint,
+        () => ApiImpactSummary(endpoint),
+      );
 
-    apiSummary.totalErrors++;
+      apiSummary.totalErrors++;
 
-    final screenImpact = apiSummary.screens.putIfAbsent(
-      screen,
-      () => ScreenImpact(),
-    );
+      final screenImpact = apiSummary.screens.putIfAbsent(
+        screen,
+        () => ScreenImpact(),
+      );
 
-    screenImpact.count++;
+      screenImpact.count++;
 
-    // Track slowest per screen
-    if (duration > screenImpact.maxDuration) {
-      screenImpact.maxDuration = duration;
-      screenImpact.slowestLog = log;
+      // Track slowest per screen
+      if (duration > screenImpact.maxDuration) {
+        screenImpact.maxDuration = duration;
+        screenImpact.slowestLog = log;
+      }
     }
   }
 
