@@ -12,9 +12,9 @@ class EmailContent {
 
 class SmartEmailReporter {
   final LogReporterConfig config;
-  final LoggerAppContext appContext;
+  final LoggerAppContext loggerAppContext;
 
-  SmartEmailReporter({required this.config, required this.appContext});
+  SmartEmailReporter({required this.config, required this.loggerAppContext});
   Future<void> sendReport() async {
     final emailContent = await prepareReport();
 
@@ -38,7 +38,9 @@ class SmartEmailReporter {
 
   /// Prepare the email report and return EmailContent
   Future<EmailContent?> prepareReport() async {
-    final reportBody = SmartDailyReportBuilder(appContext: appContext).build();
+    final reportBody = SmartDailyReportBuilder(
+      loggerAppContext: loggerAppContext,
+    ).build();
 
     return reportBody.runtimeType == Null
         ? null

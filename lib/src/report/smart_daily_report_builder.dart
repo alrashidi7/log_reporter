@@ -4,9 +4,9 @@ import 'package:log_reporter/app_log_reporter.dart';
 import 'package:talker/talker.dart';
 
 class SmartDailyReportBuilder {
-  final LoggerAppContext appContext;
+  final LoggerAppContext loggerAppContext;
 
-  SmartDailyReportBuilder({required this.appContext});
+  SmartDailyReportBuilder({required this.loggerAppContext});
   String _pretty(String key) => key.replaceAll('_', ' ').toUpperCase();
   String? build() {
     final logs = AppLogReporter.talker.history;
@@ -56,7 +56,7 @@ class SmartDailyReportBuilder {
     } else {
       buffer.writeln('Overall Status: ⚠️ Attention Required\n');
     }
-    final context = appContext.data;
+    final context = loggerAppContext.data;
 
     buffer.writeln("------------------------------");
     buffer.writeln('📱 App Information');
