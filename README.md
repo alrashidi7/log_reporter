@@ -1,8 +1,8 @@
 # 📦 App Log Reporter
 
-A **powerful, reusable logging & reporting package for Flutter apps** built on top of **Talker**, **Dio**, and **Cubit**.
+A **powerful, reusable logging & reporting package for Flutter apps** built on top of **Talker** and **Dio**.
 
-`log_reporter` helps you monitor **screen usage**, **API performance**, **errors**, and **user-facing issues**, then intelligently generates **daily or critical reports** that can be sent automatically via email.
+`log_reporter` helps you monitor **screen usage**, **API performance**, and **errors**, then **sends immediate email alerts** when users face critical issues (API errors, app crashes).
 
 Designed to be **plug-and-play**, **production-safe**, and **reusable across multiple apps**.
 
@@ -13,30 +13,22 @@ Designed to be **plug-and-play**, **production-safe**, and **reusable across mul
 ### 📊 Screen Analytics
 - Screen open count
 - Screen visible duration
-- Screen impact tracking
 
 ### 🌐 API Monitoring (Dio)
 - API duration tracking
 - Slow API detection (configurable threshold)
-- Failed request logging
+- Failed request logging with **immediate email alert**
 - Status code filtering (e.g. ignore 401 / 403)
 
-### 🧠 State & Error Tracking
-- Cubit state change logging
-- Flutter framework error capture
-- Stack trace & exception body logging
+### 🚨 Immediate Error Reporting
+- **API errors** → Sent to email instantly with full context
+- **App crashes** (Flutter errors) → Sent immediately
+- **Async errors** → Use `zoneErrorHandler` with `runZonedGuarded`
+- Each report includes: device info, network info, app version, error trace
 
 ### 🧾 Centralized Log History
 - Powered by **Talker**
 - In-memory history with configurable size
-- Optimized for batch processing
-
-### 📬 Smart Email Reporting
-- Daily summary reports
-- Critical issue detection
-- Deduplication logic
-- Avoids spam (network & one-time issues ignored)
-- Sends only when user actually faced a problem
 
 ### 🛠 Debug Tools
 - Talker debug screen (optional)
@@ -60,8 +52,6 @@ dependencies:
       url: https://github.com/alrashidi7/log_reporter.git
       ref: main
 
-
-sl.registerLazySingleton<AppLogReporter>(() => AppLogReporter());
 
 sl.registerLazySingleton<ScreenTrackingObserver>(
   () => ScreenTrackingObserver(),
@@ -103,9 +93,24 @@ sl.registerLazySingleton<SmartEmailReporter>(
   ),
 );
 
-sl.registerLazySingleton<AppLifecycleHandler>(
-  () => AppLifecycleHandler(
+// Initialize (call after DI setup, before runApp)
+void setupLogReporter() async {
+  await AppLogReporter.init(
     config: sl(),
-    reporter: sl(),
-  ),
-);
+    screenObserver: sl(),
+    loggerAppContext: sl(),
+    immediateReporter: sl(), // Enables immediate email alerts
+  );
+}
+
+// In main() - wrap runApp to catch async errors:
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await setup(); // your get_it setup
+  await setupLogReporter();
+
+  runZonedGuarded(
+    () => runApp(MyApp()),
+    AppLogReporter.zoneErrorHandler,
+  );
+}

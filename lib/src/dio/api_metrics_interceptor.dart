@@ -72,6 +72,16 @@ class ApiMetricsInterceptor extends Interceptor {
         errorLog.generateErrorMsg(),
         error.stackTrace,
       );
+
+      // Send immediate report for API errors
+      AppLogReporter.immediateReporter?.sendImmediateErrorReport(
+        errorType: 'API Error',
+        message: errorLog.generateErrorMsg(),
+        exception: error,
+        stackTrace: error.stackTrace,
+        dioException: error,
+        screenName: screenObserver.currentScreen?.screenName,
+      );
     } else {
       if (isSlow) {
         talker.warning(

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:intl/intl.dart';
@@ -60,5 +61,21 @@ class LoggerAppContext {
     };
 
     _initialized = true;
+  }
+
+  /// Fetches current network connectivity status (called when building reports)
+  Future<Map<String, dynamic>> getNetworkInfo() async {
+    try {
+      final results = await Connectivity().checkConnectivity();
+      final connectivityList = results
+          .map((r) => r.name)
+          .join(', ');
+      return {
+        'connectivity': connectivityList.isNotEmpty ? connectivityList : 'none',
+        'checked_at': DateTime.now().toIso8601String(),
+      };
+    } catch (_) {
+      return {'connectivity': 'unknown', 'error': 'Failed to fetch'};
+    }
   }
 }

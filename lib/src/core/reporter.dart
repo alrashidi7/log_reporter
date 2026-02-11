@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
-
 import 'package:log_reporter/app_log_reporter.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
@@ -13,6 +10,7 @@ class AppLogReporter {
   static late LogReporterConfig _config;
   static late ScreenTrackingObserver _screenObserver;
   static late LoggerAppContext _loggerAppContext;
+  static SmartEmailReporter? _immediateReporter;
 
   // ------------------------------
   // Initialize package
@@ -21,6 +19,7 @@ class AppLogReporter {
     required LogReporterConfig config,
     required ScreenTrackingObserver screenObserver,
     required LoggerAppContext loggerAppContext,
+    SmartEmailReporter? immediateReporter,
   }) async {
     _config = config;
 
@@ -37,6 +36,7 @@ class AppLogReporter {
     loggerAppContext.init(isProduction: config.isProduction);
 
     _loggerAppContext = loggerAppContext;
+    _immediateReporter = immediateReporter;
 
     // Set up Flutter error catching if enabled
     if (_config.enableFlutterErrorCatching) {
@@ -51,6 +51,7 @@ class AppLogReporter {
   static LogReporterConfig get config => _config;
   static ScreenTrackingObserver get screenObserver => _screenObserver;
   static LoggerAppContext get loggerContext => _loggerAppContext;
+  static SmartEmailReporter? get immediateReporter => _immediateReporter;
 
   // ------------------------------
   // Flutter Error Catching
@@ -66,6 +67,15 @@ class AppLogReporter {
         details.stack,
       );
 
+      // Send immediate report for app crashes
+      _immediateReporter?.sendImmediateErrorReport(
+        errorType: 'App Crash',
+        message: details.exceptionAsString(),
+        exception: details.exception,
+        stackTrace: details.stack,
+        screenName: screenObserver.currentScreen?.screenName,
+      );
+
       // Call default handler or dump to console
       if (defaultOnError != null) {
         defaultOnError(details);
@@ -74,21 +84,24 @@ class AppLogReporter {
       }
     };
 
-    // Catch async errors globally
-    runZonedGuarded(() {}, (error, stackTrace) {
-      final errorLog = ErrorLog(
-        exeptionMsg: error.toString(),
-        stackTrace: stackTrace,
-        type: ErrorLogType.exeption,
-        time: null,
-        apiLog: null,
-        screenLog: null,
-      );
-      talker.error(
-        '[MyAppLog]-[${screenObserver.currentScreen?.screenName}]-[Async Error]',
-        error.toString(),
-        stackTrace,
-      );
-    });
+    // Note: For async/zone errors, wrap runApp with runZonedGuarded and use
+    // AppLogReporter.zoneErrorHandler. See README.
+  }
+
+  /// Use this with runZonedGuarded in main() to catch uncaught async errors:
+  /// runZonedGuarded(() async { ... runApp(MyApp()); }, AppLogReporter.zoneErrorHandler);
+  static void zoneErrorHandler(Object error, StackTrace stackTrace) {
+    talker.error(
+      '[MyAppLog]-[${screenObserver.currentScreen?.screenName}]-[Async Error]',
+      error.toString(),
+      stackTrace,
+    );
+    _immediateReporter?.sendImmediateErrorReport(
+      errorType: 'Async Error',
+      message: error.toString(),
+      exception: error,
+      stackTrace: stackTrace,
+      screenName: screenObserver.currentScreen?.screenName,
+    );
   }
 }
